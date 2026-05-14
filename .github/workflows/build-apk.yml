@@ -50,15 +50,14 @@ jobs:
         run: |
           echo "sdk.dir=$ANDROID_HOME" > mobile/android/local.properties
 
+      - name: Ensure AndroidX flags in gradle.properties
+        run: |
+          touch mobile/android/gradle.properties
+          grep -q '^android.useAndroidX=' mobile/android/gradle.properties || echo 'android.useAndroidX=true' >> mobile/android/gradle.properties
+          grep -q '^android.enableJetifier=' mobile/android/gradle.properties || echo 'android.enableJetifier=true' >> mobile/android/gradle.properties
+
       - name: Make gradlew executable
         run: chmod +x mobile/android/gradlew
-
-      - name: Verify Gradle wrapper
-        run: |
-          if [ ! -f mobile/android/gradle/wrapper/gradle-wrapper.jar ]; then
-            echo "Gradle wrapper missing. Commit gradle-wrapper.jar to the repo."
-            exit 1
-          fi
 
       - name: Build debug APK
         run: |
