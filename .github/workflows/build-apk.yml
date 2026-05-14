@@ -37,6 +37,9 @@ jobs:
           cd mobile
           npm install
 
+      - name: Print ANDROID_HOME
+        run: echo "ANDROID_HOME=$ANDROID_HOME"
+
       - name: Create local.properties
         run: |
           echo "sdk.dir=$ANDROID_HOME" > mobile/android/local.properties
@@ -47,15 +50,14 @@ jobs:
       - name: Verify Gradle wrapper
         run: |
           if [ ! -f mobile/android/gradle/wrapper/gradle-wrapper.jar ]; then
-            echo "Gradle wrapper missing! Generating..."
-            cd mobile/android
-            gradle wrapper
+            echo "Gradle wrapper missing. Commit gradle-wrapper.jar to the repo."
+            exit 1
           fi
 
       - name: Build debug APK
         run: |
           cd mobile/android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
