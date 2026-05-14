@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: mobile/package-lock.json
 
       - name: Setup Android SDK
-        uses: nick-fields/setup-android@v3
+        uses: android-actions/setup-android@v3
         with:
           api-level: 34
           build-tools: 34.0.0
