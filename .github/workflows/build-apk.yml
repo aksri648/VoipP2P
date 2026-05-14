@@ -41,10 +41,20 @@ jobs:
         run: |
           echo "sdk.dir=$ANDROID_HOME" > mobile/android/local.properties
 
+      - name: Make gradlew executable
+        run: chmod +x mobile/android/gradlew
+
+      - name: Verify Gradle wrapper
+        run: |
+          if [ ! -f mobile/android/gradle/wrapper/gradle-wrapper.jar ]; then
+            echo "Gradle wrapper missing! Generating..."
+            cd mobile/android
+            gradle wrapper
+          fi
+
       - name: Build debug APK
         run: |
           cd mobile/android
-          chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
       - name: Create GitHub Release
