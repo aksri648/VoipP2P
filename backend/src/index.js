@@ -1,0 +1,93 @@
+require('dotenv').config();
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const { v4: uuidv4 } = require('uuid');
+
+const { initializeFirebase } = require('./services/firebaseService');
+const { initializeLiveKit } = require('./services/liveKitService');
+const setupSocketHandlers = require('./services/socketService');
+const apiRoutes = require('./routes/api');
+
+const usersDB = new Map();
+const activeCalls = new Map();
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  },
+  pingTimeout: 60000,
+  pingInterval: 25000
+});
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
+app.use(compression());
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/api', apiRoutes);
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    services: {
+      firebase: initializeFirebase() ? 'ready' : 'not_ready',
+      livekit: initializeLiveKit() ? 'ready' : 'not_ready'
+    }
+  });
+});
+
+app.get('/', (req, res) => {
+  res.json({
+    name: 'VoIP P2P Backend',
+    version: '1.0.0',
+    description: 'Production backend for anonymous voice calling'
+  });
+});
+
+setupSocketHandlers(io);
+
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+
+server.listen(PORT, HOST, () => {
+  console.log(`[Server] Running on ${HOST}:${PORT}`);
+  console.log(`[Server] Health check: http://${HOST}:${PORT}/health`);
+  
+  try {
+    initializeFirebase();
+    console.log('[Server] Firebase initialized');
+  } catch (error) {
+    console.error('[Server] Firebase initialization error:', error.message);
+  }
+  
+  try {
+    initializeLiveKit();
+    console.log('[Server] LiveKit initialized');
+  } catch (error) {
+    console.error('[Server] LiveKit initialization error:', error.message);
+  }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[Server] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('[Server] Uncaught Exception:', error);
+  process.exit(1);
+});
+
+module.exports = { app, server, io };

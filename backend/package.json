@@ -1,0 +1,30 @@
+{
+  "name": "voip-p2p-backend",
+  "version": "1.0.0",
+  "description": "Production backend for VoIP P2P anonymous voice calling",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "prod": "NODE_ENV=production node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "firebase-admin": "^12.0.0",
+    "livekit-server-sdk": "^1.2.0",
+    "@clerk/clerk-sdk-node": "^4.13.11",
+    "uuid": "^9.0.1",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

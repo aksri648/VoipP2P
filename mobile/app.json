@@ -1,0 +1,57 @@
+{
+  "name": "VoipP2P",
+  "displayName": "VoIP P2P",
+  "expo": {
+    "name": "VoipP2P",
+    "slug": "voip-p2p",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "package": "com.voipp2p",
+      "versionCode": 1,
+      "permissions": [
+        "READ_PHONE_STATE",
+        "ANSWER_PHONE_CALLS",
+        "CALL_PHONE",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "BLUETOOTH",
+        "BLUETOOTH_CONNECT",
+        "POST_NOTIFICATIONS",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.voipp2p",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio",
+          "voip",
+          "remote-notification"
+        ],
+        "NSMicrophoneUsageDescription": "This app needs microphone access for voice calls",
+        "NSBluetoothUsageDescription": "This app needs Bluetooth access for audio routing"
+      }
+    },
+    "plugins": [
+      "react-native-permissions"
+    ]
+  }
+}
