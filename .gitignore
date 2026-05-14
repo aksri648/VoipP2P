@@ -8,8 +8,12 @@ android/gradle/
 android/.gradle/
 mobile/android/app/build/
 mobile/android/build/
-mobile/android/gradle/
 mobile/android/.gradle/
+
+!mobile/android/gradle/
+!mobile/android/gradle/wrapper/
+!mobile/android/gradle/wrapper/gradle-wrapper.jar
+!mobile/android/gradle/wrapper/gradle-wrapper.properties
 
 *.apk
 *.aab
