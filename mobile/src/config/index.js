@@ -1,6 +1,6 @@
 export const Config = {
   LIVEKIT_URL: process.env.LIVEKIT_URL || 'wss://your-livekit-url.livekit.cloud',
-  SOCKET_URL: process.env.SOCKET_URL || 'https://your-backend-api.com',
+  SOCKET_URL: process.env.SOCKET_URL || 'https://voip-p2p-backend.onrender.com',
   FCM_SENDER_ID: process.env.FCM_SENDER_ID || 'your-fcm-sender-id',
   CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY || 'pk_test_your-clerk-key',
   
