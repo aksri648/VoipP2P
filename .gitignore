@@ -31,7 +31,6 @@ yarn-error.log*
 
 android/gradle.properties
 android/local.properties
-mobile/android/gradle.properties
 mobile/android/local.properties
 
 .vscode/
