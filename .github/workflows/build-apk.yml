@@ -13,6 +13,7 @@ concurrency:
 env:
   EXPO_PUBLIC_SOCKET_URL: https://voip-p2p-signaling.onrender.com
   EXPO_PUBLIC_API_KEY: vp2p_90949ffff155d044f5e43222949bee57
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx4g
 
 jobs:
   build:
@@ -41,15 +42,34 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Accept Android licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Install npm dependencies
+        run: npm install
         working-directory: mobile
 
-      - name: Build APK
-        run: npx expo run:android --no-bundler
+      - name: Expo prebuild
+        run: npx expo prebuild --platform android --no-install
         working-directory: mobile
         env:
-          EXPO_NO_DOCTOR: 1
+          CI: true
+
+      - name: Patch Promise.kt for Kotlin compat
+        run: |
+          FILE=node_modules/expo-modules-core/android/src/main/java/expo/modules/kotlin/Promise.kt
+          if [ -f "$FILE" ]; then
+            sed -i \
+              -e 's/override fun reject(code: String?, message: String?)/override fun reject(code: String, message: String?)/' \
+              -e 's/override fun reject(code: String?, throwable: Throwable?)/override fun reject(code: String, throwable: Throwable?)/' \
+              "$FILE"
+            echo "Patched Promise.kt"
+          fi
+        working-directory: mobile
+
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug --no-daemon
+        working-directory: mobile
 
       - name: Rename APK
         run: |
