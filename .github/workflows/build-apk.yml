@@ -60,8 +60,7 @@ jobs:
           FILE=node_modules/expo-modules-core/android/src/main/java/expo/modules/kotlin/Promise.kt
           if [ -f "$FILE" ]; then
             sed -i \
-              -e 's/override fun reject(code: String?, message: String?)/override fun reject(code: String, message: String?)/' \
-              -e 's/override fun reject(code: String?, throwable: Throwable?)/override fun reject(code: String, throwable: Throwable?)/' \
+              -e '/override fun reject(/s/(code: String,/(code: String?,/g' \
               "$FILE"
             echo "Patched Promise.kt"
           fi
