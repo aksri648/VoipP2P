@@ -32,14 +32,13 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate Android project files
-        run: flutter create --project-name voip_p2p --org com.voipp2p --platforms android .
-        working-directory: mobile
-
-      - name: Restore our source files
+      - name: Generate android/ in temp dir
         run: |
-          git checkout HEAD -- lib/ pubspec.yaml analysis_options.yaml
-        working-directory: mobile
+          cd /tmp
+          flutter create --project-name voip_p2p --org com.voipp2p --platforms android temp_voip
+          cp -r /tmp/temp_voip/android ${{ github.workspace }}/mobile/
+          cp /tmp/temp_voip/.gitignore ${{ github.workspace }}/mobile/ 2>/dev/null || true
+          rm -rf /tmp/temp_voip
 
       - name: Install dependencies
         run: flutter pub get

@@ -10,15 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  provider: ^6.1.2
-  socket_io_client: ^3.0.2
-  flutter_webrtc: ^0.11.7
-  flutter_callkeep: ^2.1.0
-  firebase_messaging: ^15.2.4
-  firebase_core: ^3.12.1
-  shared_preferences: ^2.3.4
-  http: ^1.2.2
-  uuid: ^4.5.1
+  provider: ^6.0.0
+  socket_io_client: ^3.0.0
+  flutter_webrtc: ^0.12.0
+  flutter_callkeep: ^1.0.0
+  firebase_messaging: ^15.0.0
+  firebase_core: ^3.0.0
+  shared_preferences: ^2.3.0
+  http: ^1.2.0
+  uuid: ^4.0.0
 
 dev_dependencies:
   flutter_test:
