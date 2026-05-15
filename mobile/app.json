@@ -1,57 +1,71 @@
 {
-  "name": "VoipP2P",
-  "displayName": "VoIP P2P",
   "expo": {
-    "name": "VoipP2P",
+    "name": "VoIP P2P",
     "slug": "voip-p2p",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
     "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#000000"
-      },
-      "package": "com.voipp2p",
-      "versionCode": 1,
-      "permissions": [
-        "READ_PHONE_STATE",
-        "ANSWER_PHONE_CALLS",
-        "CALL_PHONE",
-        "RECORD_AUDIO",
-        "MODIFY_AUDIO_SETTINGS",
-        "BLUETOOTH",
-        "BLUETOOTH_CONNECT",
-        "POST_NOTIFICATIONS",
-        "VIBRATE",
-        "WAKE_LOCK",
-        "FOREGROUND_SERVICE",
-        "INTERNET",
-        "ACCESS_NETWORK_STATE",
-        "RECEIVE_BOOT_COMPLETED"
-      ]
-    },
     "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.voipp2p",
+      "supportsTablet": true,
+      "bitcode": false,
       "infoPlist": {
-        "UIBackgroundModes": [
-          "audio",
-          "voip",
-          "remote-notification"
-        ],
-        "NSMicrophoneUsageDescription": "This app needs microphone access for voice calls",
-        "NSBluetoothUsageDescription": "This app needs Bluetooth access for audio routing"
+        "UIBackgroundModes": ["audio", "voip", "remote-notification"]
       }
     },
+    "android": {
+      "package": "com.voipp2p.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+        "android.permission.BLUETOOTH",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
     "plugins": [
-      "react-native-permissions"
-    ]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26,
+            "targetSdkVersion": 35,
+            "compileSdkVersion": 35
+          }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1a1a2e",
+          "sounds": ["./assets/ringtone.wav"]
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
   }
 }

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: voip-p2p-signaling
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node src/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_KEY
+        generateValue: true
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

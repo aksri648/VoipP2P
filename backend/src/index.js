@@ -5,15 +5,10 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-const { v4: uuidv4 } = require('uuid');
 
 const { initializeFirebase } = require('./services/firebaseService');
-const { initializeLiveKit } = require('./services/liveKitService');
 const setupSocketHandlers = require('./services/socketService');
 const apiRoutes = require('./routes/api');
-
-const usersDB = new Map();
-const activeCalls = new Map();
 
 const app = express();
 const server = http.createServer(app);
@@ -43,17 +38,16 @@ app.get('/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     services: {
-      firebase: initializeFirebase() ? 'ready' : 'not_ready',
-      livekit: initializeLiveKit() ? 'ready' : 'not_ready'
+      firebase: process.env.FIREBASE_SERVICE_ACCOUNT ? 'configured' : 'not_configured'
     }
   });
 });
 
 app.get('/', (req, res) => {
   res.json({
-    name: 'VoIP P2P Backend',
+    name: 'VoIP P2P Signaling Server',
     version: '1.0.0',
-    description: 'Production backend for anonymous voice calling'
+    description: 'P2P VoIP signaling server with single-ID connection'
   });
 });
 
@@ -65,19 +59,16 @@ const HOST = process.env.HOST || '0.0.0.0';
 server.listen(PORT, HOST, () => {
   console.log(`[Server] Running on ${HOST}:${PORT}`);
   console.log(`[Server] Health check: http://${HOST}:${PORT}/health`);
-  
-  try {
-    initializeFirebase();
-    console.log('[Server] Firebase initialized');
-  } catch (error) {
-    console.error('[Server] Firebase initialization error:', error.message);
-  }
-  
-  try {
-    initializeLiveKit();
-    console.log('[Server] LiveKit initialized');
-  } catch (error) {
-    console.error('[Server] LiveKit initialization error:', error.message);
+
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+      initializeFirebase();
+      console.log('[Server] Firebase initialized');
+    } catch (error) {
+      console.error('[Server] Firebase initialization error:', error.message);
+    }
+  } else {
+    console.log('[Server] Firebase not configured — FCM push disabled');
   }
 });
 

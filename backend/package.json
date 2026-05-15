@@ -1,7 +1,7 @@
 {
   "name": "voip-p2p-backend",
   "version": "1.0.0",
-  "description": "Production backend for VoIP P2P anonymous voice calling",
+  "description": "Signaling server for VoIP P2P app with single-ID connection",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -14,8 +14,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "firebase-admin": "^12.0.0",
-    "livekit-server-sdk": "^1.2.0",
-    "@clerk/clerk-sdk-node": "^4.13.11",
     "uuid": "^9.0.1",
     "express-rate-limit": "^7.2.0",
     "helmet": "^7.1.0",
