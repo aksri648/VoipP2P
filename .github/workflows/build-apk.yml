@@ -2,75 +2,82 @@ name: Build Android APK
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
 
-permissions:
-  contents: write
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: Build APK
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip release]')"
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Set up Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: mobile/package-lock.json
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-        with:
-          accept-android-sdk-licenses: true
 
-      - name: Install required Android SDK packages
-        run: |
-          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+      - name: Install dependencies
+        run: npm install
+        working-directory: mobile
 
-      - name: Install npm dependencies
-        run: |
-          cd mobile
-          npm install
-
-      - name: Print ANDROID_HOME
-        run: echo "ANDROID_HOME=$ANDROID_HOME"
-
-      - name: Create local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_HOME" > mobile/android/local.properties
-
-      - name: Ensure AndroidX flags in gradle.properties
-        run: |
-          touch mobile/android/gradle.properties
-          grep -q '^android.useAndroidX=' mobile/android/gradle.properties || echo 'android.useAndroidX=true' >> mobile/android/gradle.properties
-          grep -q '^android.enableJetifier=' mobile/android/gradle.properties || echo 'android.enableJetifier=true' >> mobile/android/gradle.properties
-
-      - name: Make gradlew executable
-        run: chmod +x mobile/android/gradlew
+      - name: Expo prebuild (generate android/)
+        run: npx expo prebuild --platform android --no-install
+        working-directory: mobile
 
       - name: Build debug APK
         run: |
-          cd mobile/android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          cd android
+          ./gradlew assembleDebug --no-daemon
+        working-directory: mobile
 
-      - name: Create GitHub Release
+      - name: Rename APK
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+            VoipP2P-$(git describe --tags --always 2>/dev/null || echo "latest").apk
+        working-directory: mobile
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: voip-p2p-apk
+          path: mobile/*.apk
+          retention-days: 30
+
+  release:
+    name: Create Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: voip-p2p-apk
+
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: VoipP2P Release v1.0.${{ github.run_number }}
-          draft: true
-          files: |
-            mobile/android/app/build/outputs/apk/debug/app-debug.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: '*.apk'
+          generate_release_notes: true
