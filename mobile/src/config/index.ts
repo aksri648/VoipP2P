@@ -1,14 +1,16 @@
 import { Platform } from 'react-native';
 
+const PROD_URL = 'https://voip-p2p-signaling.onrender.com';
+
 const DEV_SOCKET_URL = Platform.select({
   android: 'http://10.0.2.2:3000',
   default: 'http://localhost:3000',
 });
 
 export const Config = {
-  SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL || DEV_SOCKET_URL,
-  API_KEY: process.env.EXPO_PUBLIC_API_KEY || 'development-key',
-  SIGNALING_SERVER_URL: process.env.EXPO_PUBLIC_SOCKET_URL || DEV_SOCKET_URL,
+  SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL || PROD_URL,
+  API_KEY: process.env.EXPO_PUBLIC_API_KEY || 'vp2p_90949ffff155d044f5e43222949bee57',
+  SIGNALING_SERVER_URL: process.env.EXPO_PUBLIC_SOCKET_URL || PROD_URL,
 
   CALL_TIMEOUT: 30000,
   RING_TIMEOUT: 45000,
