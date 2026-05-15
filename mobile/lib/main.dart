@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
+import 'config/types.dart';
 import 'stores/user_store.dart';
 import 'stores/call_store.dart';
 import 'services/socket_service.dart';
@@ -53,6 +54,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   bool _ready = false;
+  bool _servicesInitialized = false;
 
   @override
   void initState() {
@@ -79,10 +81,19 @@ class _AppShellState extends State<AppShell> {
           return AuthScreen(
             userStore: userStore,
             onRegistered: () {
-              _initServices(context);
+              if (!_servicesInitialized) {
+                _servicesInitialized = true;
+                _initServices(context);
+              }
             },
           );
         }
+
+        if (!_servicesInitialized) {
+          _servicesInitialized = true;
+          _initServices(context);
+        }
+
         return const _CallNavigator();
       },
     );
@@ -207,8 +218,23 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _cleanup(BuildContext context) {
+    context.read<WebRTCService>().hangup();
+  }
+
+  void _hangup(BuildContext context) {
+    final callStore = context.read<CallStore>();
+    final socketService = context.read<SocketService>();
     final webRTCService = context.read<WebRTCService>();
+    final callKeepService = context.read<CallKeepService>();
+
+    final callId = callStore.incomingCall?.callId ?? callStore.localCallId;
+    if (callId != null) {
+      socketService.emit('call:end', {'callId': callId});
+    }
+
     webRTCService.hangup();
+    callKeepService.reportEndCall(callId ?? '');
+    callStore.reset();
   }
 }
 
@@ -259,7 +285,7 @@ class _CallNavigator extends StatelessWidget {
     callKeepService.reportConnectedCall(data.callId);
   }
 
-  void _rejectCall(BuildContext context) async {
+  void _rejectCall(BuildContext context) {
     final callStore = context.read<CallStore>();
     final data = callStore.incomingCall;
     if (data != null) {
@@ -270,7 +296,7 @@ class _CallNavigator extends StatelessWidget {
     callStore.reset();
   }
 
-  void _hangup(BuildContext context) async {
+  void _hangup(BuildContext context) {
     final callStore = context.read<CallStore>();
     final socketService = context.read<SocketService>();
     final webRTCService = context.read<WebRTCService>();
